@@ -1,27 +1,34 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var controller = require('./controllers.js');
+
 // UNCOMMENT THE DATABASE YOU'D LIKE TO USE
 // var items = require('../database-mysql');
 // var items = require('../database-mongo');
 
 var app = express();
 
-// UNCOMMENT FOR REACT
-// app.use(express.static(__dirname + '/../react-client/dist'));
+app.use(express.static(__dirname + '/../react-client/dist'));
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.json());
 
-// UNCOMMENT FOR ANGULAR
-// app.use(express.static(__dirname + '/../angular-client'));
-// app.use(express.static(__dirname + '/../node_modules'));
 
-app.get('/items', function (req, res) {
-  items.selectAll(function(err, data) {
-    if(err) {
-      res.sendStatus(500);
-    } else {
-      res.json(data);
-    }
-  });
+app.get('/recipes', function (req, res) {
+  controller.getRecipes(req, res);
 });
+
+app.post('/search/recipes', (req, res) => {
+  // console.log(req.body);
+  controller.searchRecipes(req.body, res);
+
+})
+
+app.post('/add/recipe', (req, res) => {
+  req.body.title = req.body.title.replace(/[\n\t\r]/g,"");
+  controller.addRecipe(req.body, res);
+  // res.status(200).send('yes');
+});
+
 
 app.listen(3000, function() {
   console.log('listening on port 3000!');

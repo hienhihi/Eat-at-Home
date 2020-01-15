@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/fridgeeat');
 
 var db = mongoose.connection;
 
@@ -11,21 +11,38 @@ db.once('open', function() {
   console.log('mongoose connected successfully');
 });
 
-var itemSchema = mongoose.Schema({
-  quantity: Number,
-  description: String
+var recipesSchema = mongoose.Schema({
+  title: String,
+  href: String,
+  ingredients: String,
+  thumbnail: String
 });
 
-var Item = mongoose.model('Item', itemSchema);
+var Recipe = mongoose.model('Recipe', recipesSchema);
 
 var selectAll = function(callback) {
-  Item.find({}, function(err, items) {
+  Recipe.find({}, function(err, recipes) {
     if(err) {
       callback(err, null);
     } else {
-      callback(null, items);
+      callback(null, recipes);
     }
   });
 };
 
-module.exports.selectAll = selectAll;
+var saveRecipe = (obj, callback) => {
+  let recipe = new Recipe(obj);
+  recipe.save((err, data) => {
+    if (err) {
+      callback(err, null)
+    } else {
+      callback(null, data)
+    }
+  })
+  // console.log(obj);
+}
+
+module.exports = {
+  selectAll,
+  saveRecipe
+};
